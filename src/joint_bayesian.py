@@ -7,7 +7,42 @@ from sklearn import metrics
 from sklearn.decomposition import PCA
 from sklearn.externals import joblib
 
+def loaddata(path):
+    data = []
+    with open(path, 'r') as f:
+        for line in f:           
+            sample_data = line.split('\t')
+            data.append([float(e) for e in sample_data])
+    np_data = np.array(data)
+    return np_data
 
+def loadlabel(path):
+    data = []
+    with open(path, 'r') as f:
+        for line in f:           
+            sample_data = line.split('\t')
+            data.append([int(e) for e in sample_data])
+    np_data = np.array(data)
+    return np_data
+def data_filter(data, label):
+    del_index = []
+    index = 0
+    count = 0
+    num = 1
+    for l in label:
+        if num == l:
+            count += 1
+        else:
+            if count == 1:
+                del_index.append(index-1)
+            count = 1
+            num = l
+        index += 1
+    if count == 1:
+        del_index.append(index-1)
+    return del_index
+
+        
 #Before training,the mean must be substract
 def JointBayesian_Train(trainingset, label, fold = "./"):
     if fold[-1] != '/':
@@ -43,6 +78,7 @@ def JointBayesian_Train(trainingset, label, fold = "./"):
     u  = np.zeros([n_dim, n_class])
     ep = np.zeros([n_dim, withinCount])
     nowp=0
+    print "for i in range(n_class):"
     for i in range(n_class):
         # the mean of cur[i]
         u[:,i] = np.mean(cur[i], 0)
@@ -59,11 +95,13 @@ def JointBayesian_Train(trainingset, label, fold = "./"):
     SwG   = {}
     convergence = 1
     min_convergence = 1
+    print "for l in range(500):"
     for l in range(500):
         F  = np.linalg.pinv(Sw)
         u  = np.zeros([n_dim, n_class])
         ep = np.zeros([n_dim, n_image])
         nowp = 0
+        print "for mi in range(maxNumberInOneClass + 1):"
         for mi in range(maxNumberInOneClass + 1):
             if numberBuff[mi] == 1:
 		#G = −(mS μ + S ε )−1*Su*Sw−1
@@ -72,6 +110,7 @@ def JointBayesian_Train(trainingset, label, fold = "./"):
                 SuFG[mi] = np.dot(Su, (F+mi*G))
 		#Sw*G for e
                 SwG[mi]  = np.dot(Sw, G)
+        print "for i in range(n_class):"
         for i in range(n_class):
             ##print l, i
             nn_class = cur[i].shape[0]
@@ -129,8 +168,7 @@ def PCA_Train(data, result_fold, n_components=2000):
 
 def data_pre(data):
     data = np.sqrt(data)
-    data = np.divide(data, np.repeat(np.sum(data, 1), data.shape[1]).reshape(data.shape[0], data.shape[1]))
-    
+    data = np.divide(data, np.repeat(np.sum(data, 1), data.shape[1]).reshape(data.shape[0], data.shape[1]))    
     return data
 
 def get_ratios(A, G, pair_list, data):

@@ -1,0 +1,32 @@
+for d in data:
+    if len(d)==3:
+        first = namelist.get(d[0]) + int(d[1])
+        second = namelist.get(d[0]) + int(d[2])
+    else:
+        first = namelist.get(d[0]) + int(d[1])
+        second = namelist.get(d[2]) + int(d[3])
+    f.write(str(first) + '\t' + str(second) + '\n')
+
+
+for key in namelist:
+    namelist[key] = name_accu[namelist.get(key)]
+
+for n in accu:
+    name_accu.append(count)
+    count = count + n
+
+with open("../data/lfw_label.txt", 'r') as f:
+    for line in f:
+        l = int(line[:-1])
+        if num==l:
+            count+=1
+        else:
+            accu.append(count)
+            num = l
+            count = 1
+
+ with open("../data/namelist.txt", 'r') as f:
+    for line in f:
+        namelist[line[:-1]] = count
+        count += 1
+
