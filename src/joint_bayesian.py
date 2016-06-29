@@ -6,6 +6,7 @@ from scipy.io import loadmat
 from sklearn import metrics
 from sklearn.decomposition import PCA
 from sklearn.externals import joblib
+from sklearn import preprocessing
 
 def loaddata(path):
     data = []
@@ -124,7 +125,7 @@ def JointBayesian_Train(trainingset, label, fold = "./"):
         Sw = np.cov(ep.T, rowvar=0)
         convergence = np.linalg.norm(Sw-oldSw)/np.linalg.norm(Sw)
         print_info("Iterations-" + str(l) + ": "+ str(convergence))
-        if convergence<1e-6:
+        if convergence<1e-7:
             print "Convergence: ", l, convergence
             break;
         oldSw=Sw
@@ -154,7 +155,7 @@ def Verify(A, G, x1, x2):
     return float(ratio)
 
 
-def PCA_Train(data, result_fold, n_components=2000):
+def PCA_Train(data, result_fold, n_components=500):
     print_info("PCA training (n_components=%d)..."%n_components)
 
     pca = PCA(n_components=n_components)
@@ -166,9 +167,12 @@ def PCA_Train(data, result_fold, n_components=2000):
 
     return pca
 
-def data_pre(data):
-    data = np.sqrt(data)
-    data = np.divide(data, np.repeat(np.sum(data, 1), data.shape[1]).reshape(data.shape[0], data.shape[1]))    
+def data_pre(data, result_fold):
+    #data = np.sqrt(data)
+    #data = np.divide(data, np.repeat(np.sum(data, 1), data.shape[1]).reshape(data.shape[0], data.shape[1]))    
+    scaler = preprocessing.MaxAbsScaler()
+    data = scaler.fit_transform(data)
+    joblib.dump(scaler, result_fold+"scale_model.m")
     return data
 
 def get_ratios(A, G, pair_list, data):

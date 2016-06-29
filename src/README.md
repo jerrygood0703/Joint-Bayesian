@@ -28,8 +28,9 @@
 
 # Testing step #
 
- >Modify test_lfw.py for pairs.txt and features.txt
- >Adjust thresholds and positive_num and cv2.waitKey()
- ```
- ./test_lfw.py test
- ```     
+  >Modify test_lfw.py for pairs.txt and features.txt
+  
+  >Adjust thresholds and positive_num and cv2.waitKey()
+  ```
+  ./test_lfw.py test
+  ```     
