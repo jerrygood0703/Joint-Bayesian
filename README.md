@@ -11,7 +11,7 @@
 # Usage
 >cd src
 
->python test_lfw.py
+>check README.md by Sylar
 
 # Performance
 see the [performance](https://github.com/cyh24/Joint-Bayesian/blob/master/Experiment.pdf). 
