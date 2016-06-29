@@ -16,5 +16,5 @@
 # Performance
 see the [performance](https://github.com/cyh24/Joint-Bayesian/blob/master/Experiment.pdf). 
 
->My Blog: 
+>Original author's Blog: 
 http://blog.csdn.net/cyh_24/article/details/49059475
