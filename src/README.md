@@ -20,7 +20,9 @@
  ./generate_pair.py ../data/label.txt
  ```
 2. Execute train
+
  >Modify test_lfw.py for data's path 
+ 
  >Execute test_lfw.py:
  ```
  ./test_lfw.py train
