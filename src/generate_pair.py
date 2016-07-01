@@ -41,7 +41,8 @@ for p in pairlist:
     else:
         rand.append([])
 
-f = open('pairs.txt', 'w')
+f = open(str(sys.argv[2]), 'w')
+positive = 0
 for x,y in zip(rand, pairlist):
     count = 0
     for i in range(len(x)):
@@ -53,6 +54,7 @@ for x,y in zip(rand, pairlist):
         if count == 2:
             f.write('\n')
             count = 0
+            positive += 1
 #f.close()
 
 diff = []
@@ -61,10 +63,10 @@ for i in range(len(pairlist)):
     for j in xrange(i+1, len(pairlist)):
         pair = random.sample(range(len(pairlist[j])), 1)[0]
         diff.append([pairlist[i][num], pairlist[j][pair]])
-diff_rand = random.sample(range(len(diff)), 250)
+diff_rand = random.sample(range(len(diff)), int(sys.argv[3]))
 #f = open('pairs.txt', 'a')
 for d in diff_rand:
     f.write(str(diff[d][0]+1)+'\t'+str(diff[d][1]+1)+'\n')
 f.close()
-
+print 'pos pairs:' + str(positive) + '\tneg pairs:' + str(sys.argv[3])
 
