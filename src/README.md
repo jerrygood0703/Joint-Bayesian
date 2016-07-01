@@ -17,7 +17,7 @@
  ```     
  >pairs.txt :     
  ```
- ./generate_pair.py ../data/label.txt
+ ./generate_pair.py ../data/label.txt ../data/pairs.txt 500
  ```
 2. Execute train
 
