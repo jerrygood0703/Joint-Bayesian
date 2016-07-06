@@ -12,6 +12,7 @@ def loaddata(path):
     data = []
     with open(path, 'r') as f:
         for line in f:           
+            #sample_data = line[:-3].split('\t')
             sample_data = line.split('\t')
             data.append([float(e) for e in sample_data])
     np_data = np.array(data)
@@ -170,7 +171,7 @@ def PCA_Train(data, result_fold, n_components=500):
 def data_pre(data, result_fold):
     #data = np.sqrt(data)
     #data = np.divide(data, np.repeat(np.sum(data, 1), data.shape[1]).reshape(data.shape[0], data.shape[1]))    
-    scaler = preprocessing.MaxAbsScaler()
+    scaler = preprocessing.MinMaxScaler()
     data = scaler.fit_transform(data)
     joblib.dump(scaler, result_fold+"scale_model.m")
     return data

@@ -9,7 +9,20 @@ with open(str(sys.argv[1]), 'r') as f:
     for line in f:           
         sample_data = line.split('\t')
         data.append([int(e) for e in sample_data])
-label = np.array(data)
+# Check sequence
+count = data[0]
+num = 1
+label = []
+for d in data:
+	if d==count:
+		label.append(num)
+	else:
+		num+=1
+		label.append(num)
+		count = d
+# Check label if have to
+#print label
+label = np.array(label)
 #print label[206]
 num = 1
 pairlist = []
@@ -36,7 +49,7 @@ for p in npp:
 #-----------
 rand = []
 for p in pairlist:
-    if len(p) >= 9: 
+    if len(p) >= 4: 
         rand.append(random.sample(range(len(p)), 4))
     else:
         rand.append([])

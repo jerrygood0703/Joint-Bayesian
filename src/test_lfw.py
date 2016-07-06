@@ -9,6 +9,7 @@ from sklearn import metrics
 from sklearn.decomposition import PCA
 from sklearn.externals import joblib
 from joint_bayesian import *
+import matplotlib.pyplot as plt
 
 def excute_train(train_data="../data/features.txt", train_label="../data/label.txt", result_fold="../result/lbppca=1000/"):
     #data  = loadmat(train_data)['lbp_WDRef']
@@ -61,9 +62,10 @@ def showphoto(first, second):
     concat_img[:250, :] = img1
     concat_img[250:, :] = img2
     cv2.imshow("compare", concat_img)
-    cv2.waitKey(1)
+    cv2.waitKey()
     
-def excute_test(result_fold="../result/lbppca=1000/"):
+def excute_test(result_fold="../result/emp_pca=500/", test_pair="../data/emp_pair.txt", 
+				test_data="../data/emp_test_features.txt", test_list="../data/emp_test_list.txt"):
     with open(result_fold+"A_con.pkl", "rb") as f:
         A = pickle.load(f)
     with open(result_fold+"G_con.pkl", "rb") as f:
@@ -73,20 +75,20 @@ def excute_test(result_fold="../result/lbppca=1000/"):
     test_Intra = pair_list['IntraPersonPair'][0][0] - 1
     test_Extra = pair_list['ExtraPersonPair'][0][0] - 1'''
     pairlist = []
-    with open("../data/pair.txt", 'r') as f:
+    with open(test_pair, 'r') as f:
         for line in f:
             sample = line.split('\t')
             # the pair number starts from 1, but array index starts from 0
             pairlist.append([int(e)-1 for e in sample]) 
     photolist = []
-    with open("../data/lfwlist.txt", 'r') as f:
+    with open(test_list, 'r') as f:
         for line in f:
             photolist.append(line[:-3])
     #print test_Intra, test_Intra.shape
     #print test_Extra, test_Extra.shape
 
     #data  = loadmat(test_data)['lbp_lfw']
-    data = loaddata("../data/features.txt")
+    data = loaddata(test_data)
     scaler = joblib.load(result_fold+"scale_model.m")
     data  = scaler.transform(data)
     print data
@@ -97,10 +99,11 @@ def excute_test(result_fold="../result/lbppca=1000/"):
     #data = read_pkl(result_fold+"pca_lfw.pkl")
     
     # Parameters to change
-    thresholds = [ 3710 ]
-    positive_num = 500
+    thresholds = [ 600 ]
+    positive_num = 358
     #---------------------
-    median = []
+    distances_p = []
+    distances_n = []
     maximum = 0
     minimum = 1000000
     for threshold in thresholds:
@@ -109,7 +112,7 @@ def excute_test(result_fold="../result/lbppca=1000/"):
         start = time.time()
         for p in pairlist[:positive_num]:
             distance = abs(Verify(A, G, data[p[0]], data[p[1]]))
-            median.append(distance)
+            distances_p.append(distance)
             if distance >= maximum:
                 maximum = distance
             #print distance, p[0], p[1] 
@@ -117,14 +120,14 @@ def excute_test(result_fold="../result/lbppca=1000/"):
                 t_count += 1
             #    print 'correct'
             else:
-                print distance            
+                print distance, p[0], p[1]            
             #showphoto(photolist[p[0]], photolist[p[1]])
-        median = np.array(median)
-        p_m = np.median(median)
-        median = []
+        distances_p = np.array(distances_p)
+        median_p = np.median(distances_p)
+        std_p = np.std(distances_p)
         for p in pairlist[positive_num:]:
            distance = abs(Verify(A, G, data[p[0]], data[p[1]]))
-           median.append(distance)
+           distances_n.append(distance)
            if distance < minimum:
                minimum = distance
            #print distance, p[0], p[1]
@@ -137,11 +140,18 @@ def excute_test(result_fold="../result/lbppca=1000/"):
         end = time.time()
         print t_count, f_count, threshold        
         print 'Average time per Verify: ' + str((end-start) / 1000)
-        
-    median = np.array(median)
-    n_m = np.median(median)
+        distances_n = np.array(distances_n)
+        median_n = np.median(distances_n)
+        std_n = np.std(distances_n)
     print 'max: ' + str(maximum) + ' min: ' + str(minimum)
-    print 'Positive median: ' + str(p_m) + ' / Negative median: ' + str(n_m)       
+    print 'Positive median: ' + str(median_p) + ' / Negative median: ' + str(median_n)
+    print 'Positive 90%: ' + str(std_p) + ' / Negative 90%: ' + str(std_n) 
+    #distances_p = np.sort(distances_p)
+    #distances_n = (np.sort(distances_n))[::-1]
+    plt.plot(distances_p, color="blue")
+    plt.plot(distances_n, color="red")  
+    plt.savefig(result_fold + "plot.jpg")    
+    plt.show()
     '''dist_Intra = get_ratios(A, G, test_Intra, data)
     dist_Extra = get_ratios(A, G, test_Extra, data)
 
@@ -153,7 +163,9 @@ def excute_test(result_fold="../result/lbppca=1000/"):
 
 
 if __name__ == "__main__":
-    if str(sys.argv[1]) == 'train':
+    if len(sys.argv) < 2:
+    	print 'Usage: ./test_lfw.py train/test'
+    elif str(sys.argv[1]) == 'train':
         print 'Training...'
         excute_train()
     elif str(sys.argv[1]) == 'test':
