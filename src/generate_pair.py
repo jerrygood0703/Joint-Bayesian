@@ -20,6 +20,13 @@ for d in data:
 		num+=1
 		label.append(num)
 		count = d
+'''
+f = open ("../data/label.txt", 'w') 
+for l in label:
+    f.write(str(l) + '\n')
+f.close()
+'''    
+
 # Check label if have to
 #print label
 label = np.array(label)
@@ -47,13 +54,23 @@ for p in npp:
         print 'fuckkkkkk'
     #print p
 #-----------
+# Random generate positive pairs
 rand = []
 for p in pairlist:
-    if len(p) >= 4: 
+    if len(p) >= 9: 
         rand.append(random.sample(range(len(p)), 4))
     else:
         rand.append([])
-
+'''for p in pairlist:
+	if len(p) > 1:
+		n = len(p)
+		if n %2 == 1:
+			n -= 1 
+		rand.append(random.sample(range(len(p)), n))
+	else:
+		rand.append([])
+print len(rand)'''
+#rand = random.sample(rand, 500) 
 f = open(str(sys.argv[2]), 'w')
 positive = 0
 for x,y in zip(rand, pairlist):
