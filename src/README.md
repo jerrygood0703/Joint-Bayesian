@@ -10,7 +10,9 @@
  ```
  ./create_label.sh > label.txt
  ```     
- >features.txt: follow caffe example of feature extraction     
+ >features.txt: follow caffe example of feature extraction    
+ 
+ (Have to modify caffe/tools/extract_features.cpp first)
  ```
  cd caffe
  ./cmake_build/tools/extract_features models/vgg_face_caffe/VGG_FACE.caffemodel cmake_build/examples/_temp/VGG_FACE_deploy.prototxt fc7 cmake_build/examples/_temp/features 10 leveldb GPU 0 > features.txt
