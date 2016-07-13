@@ -11,8 +11,8 @@ from sklearn.externals import joblib
 from joint_bayesian import *
 import matplotlib.pyplot as plt
 
-def excute_train(train_data="../data/features.txt", train_label="../data/label.txt", 
-				test_pair="../data/pair.txt", result_fold="../result/IR_lbppca=500/"):
+def excute_train(train_data="../data/lfw_features.txt", train_label="../data/lfw_label.txt", 
+				test_pair="../data/lfw_pair.txt", result_fold="../result/lfwpca=150/"):
     #data  = loadmat(train_data)['lbp_WDRef']
     #label = loadmat(train_label)['id_WDRef']
     
@@ -50,7 +50,7 @@ def excute_train(train_data="../data/features.txt", train_label="../data/label.t
     print data
     # joint_bayesian.PCA_Train()
     # pca training.
-    pca = PCA_Train(data, result_fold, 500)
+    pca = PCA_Train(data, result_fold, 150)
     data_pca = pca.transform(data)
     print data
     data_to_pkl(data_pca, result_fold+"pca_wdref.pkl")
@@ -65,8 +65,8 @@ def showphoto(first, second):
     cv2.imshow("compare", concat_img)
     cv2.waitKey()
     
-def excute_test(result_fold="../result/IR_lbppca=500/", test_pair="../data/pair.txt", 
-				test_data="../data/features.txt", test_list="../data/lfwlist.txt"):
+def excute_test(result_fold="../result/emp_pca=150/", test_pair="../data/emp_pair.txt", 
+				test_data="../data/emp_test_features.txt", test_list="../data/emp_test_list.txt"):
     with open(result_fold+"A_con.pkl", "rb") as f:
         A = pickle.load(f)
     with open(result_fold+"G_con.pkl", "rb") as f:
@@ -100,12 +100,12 @@ def excute_test(result_fold="../result/IR_lbppca=500/", test_pair="../data/pair.
     #data = read_pkl(result_fold+"pca_lfw.pkl")
     
     # Parameters to change
-    thresholds = [ 3400 ]
-    positive_num = 98
+    thresholds = [ -600 ]
+    positive_num = 358
     #---------------------
     distances_p = []
     distances_n = []
-    maximum = 0
+    maximum = -100000
     minimum = 1000000
     total_it = 0
     for threshold in thresholds:
@@ -113,12 +113,12 @@ def excute_test(result_fold="../result/IR_lbppca=500/", test_pair="../data/pair.
         t_count = 0
         start = time.time()
         for p in pairlist[:positive_num]:
-            distance = abs(Verify(A, G, data[p[0]], data[p[1]]))
+            distance = Verify(A, G, data[p[0]], data[p[1]])
             distances_p.append(distance)
-            if distance >= maximum:
-                maximum = distance
+            if distance < minimum:
+                minimum = distance
             #print distance, p[0], p[1] 
-            if distance < threshold:
+            if distance > threshold:
                 t_count += 1
             #    print 'correct'
             else:
@@ -129,12 +129,12 @@ def excute_test(result_fold="../result/IR_lbppca=500/", test_pair="../data/pair.
         median_p = np.median(distances_p)
         std_p = np.std(distances_p)
         for p in pairlist[positive_num:]:
-           distance = abs(Verify(A, G, data[p[0]], data[p[1]]))
+           distance = Verify(A, G, data[p[0]], data[p[1]])
            distances_n.append(distance)
-           if distance < minimum:
-               minimum = distance
+           if distance > maximum:
+               maximum = distance
            #print distance, p[0], p[1]
-           if distance >= threshold:
+           if distance <= threshold:
                 f_count += 1
            #     print 'correct'
            #else:
@@ -147,7 +147,7 @@ def excute_test(result_fold="../result/IR_lbppca=500/", test_pair="../data/pair.
         distances_n = np.array(distances_n)
         median_n = np.median(distances_n)
         std_n = np.std(distances_n)
-    print 'max: ' + str(maximum) + ' min: ' + str(minimum)
+    print 'min: ' + str(minimum) + ' max: ' + str(maximum)
     print 'Positive median: ' + str(median_p) + ' / Negative median: ' + str(median_n)
     print 'Positive std: ' + str(std_p) + ' / Negative std: ' + str(std_n) 
     #distances_p = np.sort(distances_p)
@@ -155,7 +155,7 @@ def excute_test(result_fold="../result/IR_lbppca=500/", test_pair="../data/pair.
     plt.figure(figsize=(20, 7))
     plt.plot(distances_p, color="blue")
     plt.plot(distances_n, color="red")  
-    plt.axis([0.0, total_it-positive_num, 0.0, median_n])
+    plt.axis([0.0, total_it-positive_num, 100.0, median_n])
     plt.savefig(result_fold + "plot.jpg")    
     plt.show()
     '''dist_Intra = get_ratios(A, G, test_Intra, data)
