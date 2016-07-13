@@ -11,7 +11,6 @@
  ./create_label.sh > label.txt
  ```     
  >features.txt: follow caffe example of feature extraction    
- 
  (Have to modify caffe/tools/extract_features.cpp first)
  ```
  cd caffe
