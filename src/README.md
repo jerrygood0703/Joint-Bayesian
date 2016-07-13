@@ -8,7 +8,7 @@
  ```     
  >label.txt: put create_label.sh under image folder     
  ```
- ./create_label.sh
+ ./create_label.sh > label.txt
  ```     
  >features.txt: follow caffe example of feature extraction     
  ```
